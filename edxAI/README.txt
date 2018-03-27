@@ -11,4 +11,7 @@ Algorithms implemented in projects;
 Sudoku Solver - Arc consistency, Backtrack search
 Machine Learning - Perceptrons, Linear regression, Classification with sklearn
 
-
+Note: 
+Assignment instructions are taken from Jan 29, 2018 session.
+Assignments were completed for May 1, 2017 session. 
+Instructions are equivalent for both sessions.
