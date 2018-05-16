@@ -128,6 +128,11 @@ class CNN1:
         
         # calculating activations for each layer
         a_conv = self.conv1.forward_pass(input_samples)
+        
+        #if forward pass computation of convolution layer unsuccessful
+        if(isinstance(a_conv,int)):
+            return
+        
         a_relu=self.relu1.forward_pass(a_conv)
         a_fc=self.fc1.forward_pass(a_relu)
         
