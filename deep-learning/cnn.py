@@ -84,10 +84,7 @@ class FC:
         # i=number of rows/number of neurons in output layer
         # j=number of columns/number of neurons in input layer
         
-        self.W=np.random.rand(i,j) # Weights of network
-        
-        # TESTUBG
-        # self.W=np.ones([i,j])
+        self.W=np.random.rand(i,j) # Weights of network)
     
     def forward_pass(self, input_data):
         #INPUTS
@@ -140,10 +137,10 @@ class CNN1:
         output=output+1
         
         #TESTING
-        print(a_conv)
-        print(a_relu)
-        print(a_fc)
-        print(output)
+        # print(a_conv)
+        # print(a_relu)
+        # print(a_fc)
+        # print(output)
         
         return output
     
@@ -151,25 +148,13 @@ class CNN1:
         pass
 
 #PARAMETERS
-number_of_filters = 4
-filter_dim = 3
-input_dim = 32
-padding = 1
-stride = 2
+# number_of_filters = 4
+# filter_dim = 3
+# input_dim = 32
+# padding = 1
+# stride = 2
 
-#TEST
-# testinput=[[[1,2,3],[4,5,6],[7,8,9]],[[1,1,1],[1,1,1],[1,1,1]]]
-
-# conv=Convolution([1,2],1,1)
-# print(conv.forward_pass(testinput))
-
-# testinput2=[[[1,2,3],[-4,-5,-6],[7,8,9]],[[-1,-1,-1],[1,1,1],[1,1,1]]]
-# r=ReLU()
-# print(r.forward_pass(testinput2))
-# fcl=FC(10,9)
-# print(fcl.forward_pass(testinput2))
-###############
-
+# TESTING
 inputstr="1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2"
 inputlist=inputstr.split(',')
 inputlist=[int(i) for i in inputlist]
@@ -180,4 +165,4 @@ inputdata2=np.array([inputdata,inputdata])
 print(inputdata2)
 
 cnet=CNN1()
-cnet.compute_output(inputdata2)
+print(cnet.compute_output(inputdata2))
