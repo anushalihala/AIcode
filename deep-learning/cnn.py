@@ -13,6 +13,7 @@ class Convolution:
         self.filter_num = filter_parameters[0]
         self.filter_size = filter_parameters[1]
         self.filters = np.random.rand(filter_parameters[0],filter_parameters[1],filter_parameters[1])
+        self.bias=  np.zeros(self.filter_num)
         
         # TESTING
         # self.filter_num = 4
@@ -56,7 +57,7 @@ class Convolution:
                         j_start_index=j*self.stride
                         j_end_index=j_start_index+self.filter_size
                        
-                        output[k,f,i,j] = np.sum(input_data[k, i_start_index:i_end_index ,  j_start_index:j_end_index] * self.filters[f])
+                        output[k,f,i,j] = np.sum(input_data[k, i_start_index:i_end_index ,  j_start_index:j_end_index] * self.filters[f]) + self.bias[f]
                        
         return output
     
@@ -84,7 +85,7 @@ class FC:
         # i=number of rows/number of neurons in output layer
         # j=number of columns/number of neurons in input layer
         
-        self.W=np.random.rand(i,j) # Weights of network)
+        self.W=np.random.rand(i,j+1) # Weights of network)
     
     def forward_pass(self, input_data):
         #INPUTS
@@ -94,9 +95,10 @@ class FC:
         if(not isinstance(input_data,np.ndarray)):   
             input_data=np.array(input_data)
             
+        bias = np.ones(1)
         input_vectors=[]
         for sample in input_data:
-            input_vectors.append(sample.ravel())
+            input_vectors.append(np.append(bias,sample.ravel()))
         
         input_vectors=np.array(input_vectors)
         
@@ -136,7 +138,7 @@ class CNN1:
         output=a_fc.argmax(0)
         output=output+1
         
-        #TESTING
+        # TESTING
         # print(a_conv)
         # print(a_relu)
         # print(a_fc)
