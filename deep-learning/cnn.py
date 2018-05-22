@@ -1,3 +1,14 @@
+#TODO:
+#output comments
+#which need to be np
+# output function
+# cost function
+# train function -> error from labels ->propagate back, fixed iter + check cost
+# fc bp -> update weights, return errors for all m
+# relu bp 
+# con bp
+
+
 import numpy as np
 import pdb
   
@@ -26,6 +37,8 @@ class Convolution:
     def forward_pass(self, input_data):
         #INPUTS
         #input_data: numpy array of dimensions [m,w,w], where there are m samples of height and width w
+        #OUTPUT
+        #resulting layers after applying filters
         
         #ensuring input is numpy array
         if(not isinstance(input_data,np.ndarray)):   
@@ -72,6 +85,8 @@ class ReLU:
     def forward_pass(self, input_data):
         #INPUTS
         #input_data: numpy array of dimensions [d,w,w], of depth = d, and height,width = w
+        #OUTPUT
+        #result of applying f(x) to all input values
         vmax=np.vectorize(max)
         return vmax(input_data,0)
     
@@ -90,6 +105,8 @@ class FC:
     def forward_pass(self, input_data):
         #INPUTS
         #input_data: numpy array of dimensions [m,w,w], where there are m samples of height,width = w
+        #OUTPUT
+        #values of output layer
         
         #ensuring input is numpy array
         if(not isinstance(input_data,np.ndarray)):   
@@ -103,10 +120,22 @@ class FC:
         input_vectors=np.array(input_vectors)
         
         output= np.dot(self.W,input_vectors.T)
+        
+        np.apply_along_axis(self.sigmoid,0,output)
+        
         return output
         
     def backward_pass(self):
         pass
+    
+    def sigmoid(self, x):
+        exp_val=np.exp(x)
+        return exp_val/(1+exp_val)
+        
+    def sigmoid_gradient(self,x):
+        sigmoid_val=self.sigmoid(x)
+        return sigmoid_val*(1-sigmoid_val)
+        
 
 class CNN1:
     def __init__(self):
@@ -139,15 +168,49 @@ class CNN1:
         output=output+1
         
         # TESTING
-        # print(a_conv)
-        # print(a_relu)
-        # print(a_fc)
-        # print(output)
+        print(a_conv)
+        print(a_relu)
+        print(a_fc)
+        print(output)
         
         return output
+        
+    def cost(self, output, labels):
+        #INPUTS
+        #output: numpy array of dimensions [m, 10] for m samples; values output by CNN
+        #labels: numpy array of dimensions [m, 10] for m samples; labels for training data
+        
+        #ensuring inputs are numpy arrays
+        if(not isinstance(output,np.ndarray)):   
+            output=np.array(output)
+        if(not isinstance(labels,np.ndarray)):   
+            labels=np.array(labels)
+            
+        #checking for single sample values
+        if(len(output.shape)==2):
+            m=len(output)
+        else:
+            m=1
+        
+        return (1/m)*np.sum(-labels*np.log(output) - (1-labels)*np.log(1-output))
     
     def train(self):
         pass
+
+        
+def augment_output(simple_labels):
+    #INPUTS
+    #simple_labels: array of dimensions [m]; values range from 1 to 10; label x indicates output neuron x = 1 and all other output neurons = 0
+    #OUTPUT
+    #array of dimensions [m, 10] where for each i=1,2..m, [i,x]=1 and [i,not x]=0
+    
+    m=len(simple_labels)
+    augmented_labels=np.zeros([m,10])
+    for i in range(m):
+        ith_label=simple_labels[i]
+        augmented_labels[i,ith_label-1]=1
+        
+    return augmented_labels
 
 #PARAMETERS
 # number_of_filters = 4
@@ -157,14 +220,18 @@ class CNN1:
 # stride = 2
 
 # TESTING
-inputstr="1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2"
-inputlist=inputstr.split(',')
-inputlist=[int(i) for i in inputlist]
-inputlist=inputlist*32
-inputvect=np.array(inputlist)
-inputdata=inputvect.reshape(32,32)
-inputdata2=np.array([inputdata,inputdata])
-print(inputdata2)
+# inputstr="1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2"
+# inputlist=inputstr.split(',')
+# inputlist=[int(i) for i in inputlist]
+# inputlist=inputlist*32
+# inputvect=np.array(inputlist)
+# inputdata=inputvect.reshape(32,32)
+# inputdata2=np.array([inputdata,inputdata])
+# print(inputdata2)
 
 cnet=CNN1()
-print(cnet.compute_output(inputdata2))
+# print(cnet.compute_output(inputdata2))
+
+# a=[[1,0,0],[0,1,0]]
+# b=[[0.2,0.01,0.01],[0.01,0.9,0.4]]
+# print(cnet.cost(b,a))
