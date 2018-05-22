@@ -90,7 +90,7 @@ class ReLU:
         vmax=np.vectorize(max)
         return vmax(input_data,0)
     
-    def backward_pass(self):
+    def backward_pass(self,output_error):
         pass
         
 class FC:
@@ -101,13 +101,8 @@ class FC:
         # j=number of columns/number of neurons in input layer
         
         self.W=np.random.rand(i,j+1) # Weights of network)
-    
-    def forward_pass(self, input_data):
-        #INPUTS
-        #input_data: numpy array of dimensions [m,w,w], where there are m samples of height,width = w
-        #OUTPUT
-        #values of output layer
         
+    def process_input(self,input_data):
         #ensuring input is numpy array
         if(not isinstance(input_data,np.ndarray)):   
             input_data=np.array(input_data)
@@ -119,14 +114,48 @@ class FC:
         
         input_vectors=np.array(input_vectors)
         
+        return input_vectors
+    
+    def forward_pass(self, input_data):
+        #INPUTS
+        #input_data: numpy array of dimensions [m,w,w], where there are m samples of height,width = w
+        #OUTPUT
+        #values of output layer
+        
+        input_vectors=self.process_input(input_data)
+        
         output= np.dot(self.W,input_vectors.T)
         
         np.apply_along_axis(self.sigmoid,0,output)
         
         return output
         
-    def backward_pass(self):
-        pass
+    def backward_pass(self, input_data, output_error,learning_rate):
+        #INPUTS
+        #input_data: numpy array of dimensions [m,w,w], where there are m samples of height,width = w
+        #output_error: numpy array of dimensions [m,i], (output-label) for i neurons in m samples
+        #learning_rate: learning rate for weight updation
+        #OUTPUT
+        #[m,j] array of errors in input layer for each sample
+        #FUNCTION UPDATES WEIGHTS ACCORDINGLY
+        
+        input_vectors=self.process_input(input_data)
+        m=len(input_vectors)
+        
+        np.apply_along_axis(self.sigmoid_gradient,0,input_vectors)
+        
+        input_error = np.dot(output_error,self.W)*input_vectors
+        
+        for i in range(m):
+            temp=np.dot(output_error[i:i+1,:].T,input_vectors[i])
+            Delta = Delta + temp
+            
+        Gradient=(1/m)*Delta
+        
+        self.W=self.W-learning_rate*Gradient
+        
+        return input_error
+        
     
     def sigmoid(self, x):
         exp_val=np.exp(x)
@@ -168,10 +197,10 @@ class CNN1:
         output=output+1
         
         # TESTING
-        print(a_conv)
-        print(a_relu)
-        print(a_fc)
-        print(output)
+        # print(a_conv)
+        # print(a_relu)
+        # print(a_fc)
+        # print(output)
         
         return output
         
@@ -194,9 +223,23 @@ class CNN1:
         
         return (1/m)*np.sum(-labels*np.log(output) - (1-labels)*np.log(1-output))
     
-    def train(self):
-        pass
-
+    def train(self, training_data):
+        #INPUTS
+        #training_data: numpy array of dimensions [m,1025] where there are m samples and last column is the corresponding label
+        
+        #ensuring input is numpy array
+        if(not isinstance(training_data,np.ndarray)):   
+            training_data=np.array(training_data)
+            
+        m=training_data.shape[0]
+        k=training_data.shape[1]        
+        
+        X=training_data[:,0:k-1]
+        y=training_data[:,k-1]
+        
+        np.apply_along_axis(augment_output,0,y)
+        
+        
         
 def augment_output(simple_labels):
     #INPUTS
@@ -220,17 +263,17 @@ def augment_output(simple_labels):
 # stride = 2
 
 # TESTING
-# inputstr="1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2"
-# inputlist=inputstr.split(',')
-# inputlist=[int(i) for i in inputlist]
-# inputlist=inputlist*32
-# inputvect=np.array(inputlist)
-# inputdata=inputvect.reshape(32,32)
-# inputdata2=np.array([inputdata,inputdata])
-# print(inputdata2)
+inputstr="1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2"
+inputlist=inputstr.split(',')
+inputlist=[int(i) for i in inputlist]
+inputlist=inputlist*32
+inputvect=np.array(inputlist)
+inputdata=inputvect.reshape(32,32)
+inputdata2=np.array([inputdata,inputdata])
+print(inputdata2)
 
 cnet=CNN1()
-# print(cnet.compute_output(inputdata2))
+print(cnet.compute_output(inputdata2))
 
 # a=[[1,0,0],[0,1,0]]
 # b=[[0.2,0.01,0.01],[0.01,0.9,0.4]]
