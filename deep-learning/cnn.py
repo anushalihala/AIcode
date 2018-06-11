@@ -1,13 +1,3 @@
-#TODO:
-#output comments
-#which need to be np
-# output function
-# cost function
-# train function -> error from labels ->propagate back, fixed iter + check cost
-# fc bp -> update weights, return errors for all m
-# relu bp 
-# con bp
-
 
 import numpy as np
 import pdb
