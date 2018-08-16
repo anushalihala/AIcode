@@ -70,7 +70,7 @@ face_classifier = cv2.CascadeClassifier(cascade_path)
 
 if not successful:
 
-break
+	break
 
 ```
 
