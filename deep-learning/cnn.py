@@ -14,7 +14,7 @@ class Convolution:
         self.filter_num = filter_parameters[0]
         self.filter_size = filter_parameters[1]
         self.filters = np.random.rand(filter_parameters[0],filter_parameters[1],filter_parameters[1])
-        #self.bias=  np.zeros(self.filter_num) #TODO
+        #self.bias =  np.zeros(self.filter_num) #TODO
         
         self.stride=in_stride
         self.padding=in_padding     
@@ -59,7 +59,7 @@ class Convolution:
                        
         return output
     
-    def backward_pass(self, input_data, output_error,learning_rate):
+    def backward_pass(self, input_data, output_error, learning_rate):
         #INPUTS
         #input_data: numpy array of dimensions [m,w,w], of m samples of height,width = w
         #output_error: numpy array of dimensions [m,f,o,o] of errors
@@ -152,11 +152,11 @@ class FC:
         #OUTPUT
         #values of output layer
         
-        input_vectors=self.process_input(input_data)
+        input_vectors = self.process_input(input_data)
         
-        output= np.dot(self.W,input_vectors.T)
+        output = np.dot(self.W,input_vectors.T)
         
-        output=self.sigmoid(output)
+        output = self.sigmoid(output)
         
         return output
         
@@ -169,16 +169,16 @@ class FC:
         #[m,j] array of errors in input layer for each sample
         #FUNCTION UPDATES WEIGHTS ACCORDINGLY
         
-        input_vectors=self.process_input(input_data)
-        m=len(input_vectors)
+        input_vectors = self.process_input(input_data)
+        m = len(input_vectors)
 
-        input_vectors=np.apply_along_axis(self.sigmoid_gradient,0,input_vectors)
+        input_vectors = np.apply_along_axis(self.sigmoid_gradient, 0, input_vectors)
         
-        input_error = np.dot(output_error,self.W)*input_vectors
+        input_error = np.dot(output_error, self.W) * input_vectors
         
-        Delta=np.zeros(self.W.shape)
+        Delta = np.zeros(self.W.shape)
         for i in range(m):
-            temp=np.dot(output_error[i:i+1,:].T,input_vectors[i:i+1,:])
+            temp = np.dot(output_error[i:i+1,:].T, input_vectors[i:i+1,:])
             Delta = Delta + temp
             
         Gradient=(1/m)*Delta
@@ -204,29 +204,29 @@ class CNN1:
         #Fully connected layer with no hidden layers, with 1024 input neurons and 10 output neurons
         #Output  - 10x1 vector
         
-        self.conv1=Convolution([4,3],2,1)
-        self.relu1=ReLU()
-        self.fc1=FC(10,1024)
+        self.conv1 = Convolution([4,3],2,1)
+        self.relu1 = ReLU()
+        self.fc1 = FC(10,1024)
         
     def compute_output(self, input_samples):
         #INPUTS
         #input_samples: array of dimensions [m,w x w], where there are m samples of height and width w
         
         #converting to dimensions [m,w,w]
-        input_samples=self.augment_X(input_samples,0)
+        input_samples = self.augment_X(input_samples, 0)
         
         # calculating activations for each layer
         a_conv = self.conv1.forward_pass(input_samples)
         
-        #if forward pass computation of convolution layer unsuccessful
-        if(isinstance(a_conv,int)):
-            return
+        #if forward pass computation of convolution layer unsuccessful (-1 returned on error)
+        if(isinstance(a_conv, int)):
+            return 
         
-        a_relu=self.relu1.forward_pass(a_conv)
-        a_fc=self.fc1.forward_pass(a_relu)
+        a_relu = self.relu1.forward_pass(a_conv)
+        a_fc = self.fc1.forward_pass(a_relu)
         
-        output=a_fc.argmax(0)
-        output=output+1
+        output = a_fc.argmax(0)
+        output = output+1
         
         # TESTING
         # print(a_conv)
@@ -264,17 +264,17 @@ class CNN1:
         if(not isinstance(training_data,np.ndarray)):   
             training_data=np.array(training_data)
          
-        m=training_data.shape[0]
-        k=training_data.shape[1]        
+        m = training_data.shape[0]
+        k = training_data.shape[1]        
         
-        X=training_data[:,0:k-1]
-        pre_y=training_data[:,k-1]
+        X = training_data[:,0:k-1]
+        pre_y = training_data[:,k-1]
            
-        y=np.apply_along_axis(self.augment_label,0,pre_y)
+        y = np.apply_along_axis(self.augment_label, 0, pre_y)
         
         
         #converting to dimensions [m,w,w]
-        X=self.augment_X(X,0)
+        X = self.augment_X(X,0)
         
         for count in range(200):
             # FORWARD PASSES
@@ -282,24 +282,24 @@ class CNN1:
             #if forward pass computation of convolution layer unsuccessful
             if(isinstance(a_conv,int)):
                 return
-            a_relu=self.relu1.forward_pass(a_conv)
-            a_fc=self.fc1.forward_pass(a_relu)
+            a_relu = self.relu1.forward_pass(a_conv)
+            a_fc = self.fc1.forward_pass(a_relu)
                 
             #BACKWARD PASSES    
             error = a_fc.T-y
             #(TESTING)
             print(np.sum(error*error))  #ISSUE: sigmoid function in FC layer results in approximation which causes log0 calculation in self.cost
          
-            error_relu=self.fc1.backward_pass(a_relu,error,0.5)
+            error_relu = self.fc1.backward_pass(a_relu, error, 0.5)
             # converting to dimensions [m,d,w,w]
-            error_relu= self.augment_X(error_relu,1) 
+            error_relu = self.augment_X(error_relu,1) 
             
-            error_conv=self.relu1.backward_pass(a_conv,error_relu)
+            error_conv = self.relu1.backward_pass(a_conv,error_relu)
             
             self.conv1.backward_pass(X,error_conv,1)
             
         print("labels", y)
-        print("CNN output",a_fc.T)
+        print("CNN output", a_fc.T)
         
     def augment_label(self, simple_labels):
         #INPUTS
@@ -307,11 +307,11 @@ class CNN1:
         #OUTPUT
         #array of dimensions [m, 10] where for each i=1,2..m, [i,x]=1 and [i,not x]=0
         
-        m=len(simple_labels)
-        augmented_labels=np.zeros([m,10])
+        m = len(simple_labels)
+        augmented_labels = np.zeros([m,10])
         for i in range(m):
-            ith_label=simple_labels[i]
-            augmented_labels[i,ith_label-1]=1
+            ith_label = simple_labels[i]
+            augmented_labels[i,ith_label-1] = 1
             
         return augmented_labels
         
